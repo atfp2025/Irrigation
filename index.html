@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>CFA Mateur</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+   <!-- Supabase Auth check -->
+  <script>
+  const supabase = window.supabase.createClient(
+    "https://wjqdzyluvtyvmddjjwho.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqcWR6eWx1dnR5dm1kZGpqd2hvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NzczNjAsImV4cCI6MjA2NjI1MzM2MH0.6cdB0sesuBGizIKdQ_FVtFO2JNQwl24qUQf8z3KLthQ"
+  );
+
+  async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = "login.html";
+    } else {
+      initMqttClient(); // lancer MQTT seulement si l'utilisateur est connecté
+    }
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+  }
+
+  window.onload = checkSession;
+</script>
+
+  <header class="site-header"></header>
+
+  <div>
+    <img src="logo1.png" alt="logo Icon" class="logo" />
+    <h1 class="site-title">Smart Irrigation for Modern Agriculture</h1>
+  </div>
+
+  <div class="separator">
+    <div class="sensor-panel">
+      <div class="sensor-column">
+        <div class="sensor-display">
+          <img src="thermo.png" alt="Temperature Icon" class="sensor-icon">
+          <label class="label">Temperature:</label>
+          <input type="text" id="tempValue" readonly>
+        </div>
+        <div class="sensor-display">
+          <img src="hum3.png" alt="Humidity Icon" class="sensor-icon1">
+          <label class="label">Humidity:</label>
+          <input type="text" id="humidityValue" readonly>
+        </div>
+      </div>
+      <div class="sensor-column">
+        <div class="sensor-display">
+          <img src="sol_hum.png" alt="Soil Moisture Icon" class="sensor-icon">
+          <label class="label">Soil Moisture:</label>
+          <input type="text" id="soilMoistureValue" readonly>
+        </div>
+        <div class="sensor-display">
+          <img src="rain.png" alt="Rain Icon" class="sensor-icon">
+          <label class="label">Rain Status:</label>
+          <input type="text" id="rainStatus" readonly>
+        </div>
+      </div>
+    </div>
+
+    <div class="sensor-display">
+      <label class="label">Pump Status:</label>
+      <input type="text" id="relayStatus" readonly>
+      <label class="label" style="margin-left: 20px;">Valve Status:</label>
+      <input type="text" id="ledStatus" readonly>
+      <label class="label" style="margin-left: 20px;">Water Level:</label>
+      <input type="text" id="levelStatus" readonly>
+    </div>
+
+    <div class="control-box">
+      <div class="left-column">
+        <img src="arrosage4.png" alt="slogan Icon" class="slogan">
+      </div>
+      <div class="middle-column">
+        <button onclick="setMode('auto')">Auto</button>
+        <button onclick="setMode('manuel')">Manuel</button>
+      </div>
+      <div class="right-column">
+        <div class="button-row">
+          <button onclick="toggleRelay('ON')">Pump ON</button>
+          <button onclick="toggleRelay('OFF')">Pump OFF</button>
+        </div>
+        <div class="button-row">
+          <button onclick="toggleLED('ON')">Valve ON</button>
+          <button onclick="toggleLED('OFF')">Valve OFF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="Alert">
+      <div id="alert" style="color: red; font-weight: bold; display: none;"></div>
+    </div>
+
+    <div class="courbe" style="display: flex; justify-content: center; gap: 40px; margin-top: 30px;">
+      <div style="text-align: center;">
+        <h4 class="chart-title" style="color: green;">Soil Moisture Trend</h4>
+        <canvas id="soilChart" style="max-width: 500px;"></canvas>
+      </div>
+      <div style="text-align: center;">
+        <h4 class="chart-title" style="color: red;">Temperature Trend</h4>
+        <canvas id="tempChart" style="max-width: 500px;"></canvas>
+      </div>
+    </div>
+
+    <label id="name-label">Houda MEDDEB</label>
+    <label id="year-label">2024/2025</label>
+    <label id="titre-label" class="titre-label">CFA Mateur</label>
+    <label id="logout-label" onclick="logout()" style="font-size: 14px; color: blue; cursor: pointer; display: block; margin-top: 5px;">
+      Log out
+    </label>
+  </div>
+
+  <audio id="alertSound" src="alert4.mp3" preload="auto" loop></audio>
+
+  <!-- MQTT -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <script>
+    const mqttBroker = "wss://5908c37de7ba426eb250b9aac54fa08f.s1.eu.hivemq.cloud:8884/mqtt";
+    const mqttUsername = "houda";
+    const mqttPassword = "Youssefyassine108";
+    const clientId = "webClient";
+
+    let client;
+
+    function initMqttClient() {
+      client = new Paho.MQTT.Client(mqttBroker, clientId);
+      client.onConnectionLost = function (responseObject) {
+        if (responseObject.errorCode !== 0) {
+          console.log("Connexion perdue: " + responseObject.errorMessage);
+        }
+      };
+      client.onMessageArrived = function(message) {
+        const topic = message.destinationName;
+        const payload = message.payloadString;
+        if (topic === "smart_irrigation/temperature") {
+          document.getElementById("tempValue").value = payload + " °C";
+          updateTempChart(parseFloat(payload));
+        } else if (topic === "smart_irrigation/humidity") {
+          document.getElementById("humidityValue").value = payload + " %";
+        } else if (topic === "smart_irrigation/soil_moisture") {
+          document.getElementById("soilMoistureValue").value = payload + " %";
+          updateSoilChart(parseFloat(payload));
+        } else if (topic === "smart_irrigation/rain_detected") {
+          document.getElementById("rainStatus").value = payload;
+        } else if (topic === "smart_irrigation/relay_status") {
+          document.getElementById("relayStatus").value = payload;
+        } else if (topic === "smart_irrigation/led_status") {
+          document.getElementById("ledStatus").value = payload;
+        }else if (topic === "smart_irrigation/level") {
+          document.getElementById("levelStatus").value = payload;
+        } else if (topic === "smart_irrigation/ir_alert") {
+          const alertBox = document.getElementById("alert");
+          const alertSound = document.getElementById("alertSound");
+          if (payload.trim() === "Intruder detected") {
+            alertBox.innerText = "🚨 ALERT: Intruder Detected!";
+            alertBox.style.display = "block";
+            alertSound.play().catch(err => console.log("Erreur audio :", err));
+          } else {
+            alertBox.innerText = "";
+            alertBox.style.display = "none";
+            alertSound.pause();
+            alertSound.currentTime = 0;
+          }
+        }
+      };
+
+      client.connect({
+        onSuccess: onConnect,
+        userName: mqttUsername,
+        password: mqttPassword,
+        useSSL: true,
+        onFailure: (error) => console.log("Échec de connexion: ", error.errorMessage)
+      });
+    }
+
+    function onConnect() {
+      console.log("Connecté au broker MQTT");
+      const topics = [
+        "smart_irrigation/temperature",
+        "smart_irrigation/humidity",
+        "smart_irrigation/soil_moisture",
+        "smart_irrigation/rain_detected",
+        "smart_irrigation/ir_alert",
+        "smart_irrigation/relay_status",
+        "smart_irrigation/led_status",
+        "smart_irrigation/level"
+      ];
+      topics.forEach(topic => client.subscribe(topic));
+      const message = new Paho.MQTT.Message("off");
+      message.destinationName = "smart_irrigation/mode";
+      message.retained = true;
+      client.send(message);
+    }
+
+    function controlDevice(topic, message) {
+      if (client && client.isConnected()) {
+        const mqttMessage = new Paho.MQTT.Message(message);
+        mqttMessage.destinationName = topic;
+        client.send(mqttMessage);
+      }
+    }
+
+    function toggleLED(state) {
+      controlDevice("smart_irrigation/led", state);
+    }
+
+    function toggleRelay(state) {
+      controlDevice("smart_irrigation/relay", state);
+    }
+
+    function setMode(mode) {
+      const message = new Paho.MQTT.Message(mode);
+      message.destinationName = "smart_irrigation/mode";
+      message.retained = true;
+      client.send(message);
+      console.log("Mode changé en :", mode);
+    }
+  </script>
+
+  <!-- Graphiques -->
+  <script>
+    const soilChart = new Chart(document.getElementById('soilChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Soil Moisture (%)',
+          data: [],
+          borderColor: 'green',
+          backgroundColor: 'rgba(0, 128, 0, 0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: 'Time' } },
+          y: { beginAtZero: true, max: 100, title: { display: true, text: '%' } }
+        }
+      }
+    });
+
+    function updateSoilChart(value) {
+      const now = new Date().toLocaleTimeString();
+      if (soilChart.data.labels.length >= 20) {
+        soilChart.data.labels.shift();
+        soilChart.data.datasets[0].data.shift();
+      }
+      soilChart.data.labels.push(now);
+      soilChart.data.datasets[0].data.push(value);
+      soilChart.update();
+    }
+  </script>
+
+  <script>
+    const tempChart = new Chart(document.getElementById('tempChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: [],
+          borderColor: 'red',
+          backgroundColor: 'rgba(255, 0, 0, 0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: 'Time' } },
+          y: { beginAtZero: true, title: { display: true, text: '°C' } }
+        }
+      }
+    });
+
+    function updateTempChart(value) {
+      const now = new Date().toLocaleTimeString();
+      if (tempChart.data.labels.length >= 20) {
+        tempChart.data.labels.shift();
+        tempChart.data.datasets[0].data.shift();
+      }
+      tempChart.data.labels.push(now);
+      tempChart.data.datasets[0].data.push(value);
+      tempChart.update();
+    }
+  </script>
+</body>
+</html>

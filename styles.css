@@ -1,0 +1,305 @@
+/* Style pour le séparateur */
+
+.titre-label {
+  position: fixed;    /* ou 'absolute' selon votre besoin */
+  top: 20px;          /* Distance du haut de la page */
+  right: 20px;        /* Distance du bord droit */
+  font-size: 24px;    /* Taille de la police augmentée */
+  color: #1c0df0; /* Couleur bleue */
+  font-weight: bold;  /* Texte en gras */
+  z-index: 1000;      /* S'assure qu'il est au-dessus des autres éléments */
+  background-color: rgba(255, 255, 255, 0.7); /* Fond légèrement visible */
+  padding: 5px 10px;  /* Espacement autour du texte */
+  border-radius: 5px; /* Coins arrondis */
+}
+.courbe {
+  margin-top: 30px;
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  height: 140px; /* taille raisonnable pour un logo */
+}
+.slogan {
+  width: 200px; /* ou toute autre taille, par ex. 50%, 100px etc. */
+  display: block;
+  margin: 10px auto;
+}
+.separator {
+    height: 30px;
+    background-color: #FFFFFF; /* Blanc */
+    margin: 20px 0;
+  }
+  
+  /* Style pour l'en-tête */
+  .site-header {
+    display: flex;  /* Aligne les éléments horizontalement */
+    align-items: center;  /* Aligne verticalement au centre */
+    padding: 20;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #19a019;
+  }
+  
+  
+  /* Style du logo */
+
+  #app-logo {
+    position: fixed;
+    margin-bottom: 0px;
+    right: 10px;        /* Distance du bord droit */
+    width: 200px;        /* Largeur du logo, ajustez selon votre besoin */
+    height: 200;       /* Garde le ratio de l'image */
+}
+ 
+  /* Style du titre du site */
+  .site-title {
+    font-size: 24px;
+    color: #1c0df0;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+  }
+
+  #name-label {
+    position: fixed;
+    bottom: 20px;       /* Distance du bas de la page */
+    right: 20px;        /* Distance du bord droit */
+    font-size: 20px;    /* Taille de la police */
+    font-weight: bold;  /* Met en gras le texte */
+    color: #1c0df0;;;        /* Couleur du texte */
+}
+#year-label {
+  position: fixed;
+  bottom: 20px;          /* Distance du haut de la page */
+  left: 20px;         /* Distance du bord gauche */
+  font-size: 20px;    /* Taille de la police */
+  font-weight: bold;  /* Texte en gras */
+  color: #1c0df0;;;        /* Couleur du texte en bleu */
+}
+  /* Style pour le conteneur des capteurs et des boutons */
+  .separator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    padding: 0px;
+  }
+  
+ 
+  .sensor-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px; 
+    background: white;
+    box-shadow: 8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff; /* Ombre 3D douce */
+    border-radius: 20px; /* Coins arrondis */
+    margin: 20px auto;
+    max-width: 700px;
+    flex-wrap: wrap;
+    border: 2px solid black; 
+  }
+  
+  .sensor-icon,
+  .sensor-icon1 {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+  }
+
+/* Facultatif : amélioration de l’espacement entre colonnes */
+.sensor-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+input[type="text"] {
+  width: 100px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+}
+  
+  .sensor-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap:10px
+  }
+  
+ 
+  .sensor-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+ 
+  
+  
+  /* Style des labels de température et d'humidité */
+  .label {
+    min-width: 100px;       /* Taille fixe pour alignement */
+    text-align: right;
+    font-weight: bold;
+  }
+  
+ 
+  .control-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 15px; 
+  background: white;
+  box-shadow: 8px 8px 20px #b8b8b8, -8px -8px 20px #ffffff; /* Ombre 3D douce */
+  border-radius: 20px; /* Coins arrondis */
+  margin: 20px auto;
+  max-width: 900px;
+  flex-wrap: wrap;
+  height: 200px; 
+  width:700px;
+  border: 2px solid rgb(0, 0, 0); 
+  gap:40px;
+  flex-wrap: nowrap;
+}
+  /* Style pour les zones de texte */
+ 
+  /* Regroupe les capteurs à gauche avec une marge */
+
+
+/* Aligner proprement les lignes capteur + texte + champ */
+.sensor-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* Boîte des valeurs (input) */
+.sensor-display input[type="text"] {
+  background-color: white;     /* Fond blanc */
+  border: none;                /* Pas de bordure */
+  padding: 8px 12px;           /* Un peu d’espace à l’intérieur */
+  width: 120px;                /* Largeur augmentée */
+  font-size: 16px;             /* Texte plus lisible */
+  border-radius: 5px;          /* Coins arrondis (optionnel) */
+  box-shadow: 0 0 3px rgba(0,0,0,0.1); /* Légère ombre douce (optionnel) */
+  
+}
+
+.sensor-display label + input {
+  margin-right: 15px;
+}
+
+.sensor-display label:last-of-type {
+  margin-left: 20px;
+}
+ 
+
+
+.button-row {
+  display: flex;
+  gap: 20px; /* espace horizontal entre les deux boutons */
+  justify-content: center;
+  align-items: center; /* assure l'alignement vertical */
+}
+button {
+  padding: 12px 15px;       /* même espacement interne */
+  font-size: 16px;
+  width: 120px;             /* fixe la largeur pour que tous soient identiques */
+  height: 40px;             /* fixe la hauteur aussi */
+  border-radius: 8px;
+  border: none;
+  background-color: #19a019;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+.control-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px;
+  gap: 50px;
+  flex-wrap: wrap; /* pour responsive */
+}
+/* Colonne gauche : image + texte */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Colonne droite : boutons */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.middle-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  margin: 0 20px;
+}
+
+.middle-column button {
+  display: flex;
+  padding: 8px 16px;
+  background-color: #1268c4; /* 💙 fond bleu */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px; /* même style que ON/OFF */
+  justify-content: center; /* 👈 centre horizontalement */
+  align-items: center;     /* 👈 centre verticalement */
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 70px; /* 👈 réduit la largeur */
+  height: 40px;
+  align-self: center;
+ text-align: center;
+}
+
+
+
+.middle-column .round-button:hover {
+  background-color: #1450c8;
+ 
+}
+
+.left-column,
+.middle-column,
+.right-column {
+  margin: 0 1px; /* 👈 réduit l'espace autour de chaque colonne */
+}
+.chart-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.slogan {
+  width: 200px;
+  display: block;
+  margin: 10px auto;
+}
+
+  
+  .Alert {
+    font-size: 1.5em; /* Taille du texte */
+    font-weight: bold; /* Texte en gras */
+    color: red; /* Couleur du texte */
+    text-align: center; /* Centrage du texte */
+    justify-content: center;
+  }
+
+  

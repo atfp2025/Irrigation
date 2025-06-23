@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  
+</head>
+<body>
+  <div class="app">
+    <h2>Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <input type="password" id="confirm-password" placeholder="Confirm Password" />
+    <button onclick="handleSignUp()">Sign Up</button>
+    <p id="error-msg" style="color:red;"></p>
+    <p>Already have an account? <a href="login.html">Log In</a></p>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      "https://wjqdzyluvtyvmddjjwho.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqcWR6eWx1dnR5dm1kZGpqd2hvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NzczNjAsImV4cCI6MjA2NjI1MzM2MH0.6cdB0sesuBGizIKdQ_FVtFO2JNQwl24qUQf8z3KLthQ"
+    );
+
+    async function handleSignUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      const errorMsg = document.getElementById("error-msg");
+
+      errorMsg.innerText = "";
+
+      if (password !== confirmPassword) {
+        errorMsg.innerText = "Passwords do not match.";
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+
+      if (error) {
+        errorMsg.innerText = error.message;
+      } else {
+        alert("Sign up successful! Please check your email to confirm.");
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+</body>
+</html>
